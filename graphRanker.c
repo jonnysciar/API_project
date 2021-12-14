@@ -16,19 +16,19 @@ void max_heapify(topKstruct[], int, int);
 void swapTopK(topKstruct[], int, int);
 void inserimentoTopK(topKstruct[], int);
 
+void printInt(int);
+
 int main (int argc, char* argv[]){
 	int n = 0;
 	int k = 0;
 	int i;
 	int counter = -1;
 	char string[15];
-	topKstruct curr;// max; 
-	
-	
+
 	if (scanf("%d %d\n", &n, &k)){}
 	
+	topKstruct curr;
 	topKstruct topKvet[k];
-	
 	
 	for (i=0; i<k; i++){
 		topKvet[i].sumPath = -1;
@@ -36,14 +36,15 @@ int main (int argc, char* argv[]){
 	}
 	
 	if(fgets(string, 15, stdin)){}
-	//printf("%s", string);
+	
 	while(!(feof(stdin))){
 
 		if (strncmp(string, "AggiungiGrafo", 13)==0){
+			
 			counter++;
 			curr.position = counter;
 			curr.sumPath = dijkstraSum(n);
-			//printf("\n%d - %ld\n", curr.position, curr.sumPath);
+			
 			if (counter<k){
 				topKvet[counter] = curr;
 			}
@@ -59,23 +60,23 @@ int main (int argc, char* argv[]){
 					max_heapify(topKvet, 0, k);
 				}
 			}
+			
 		}
 		
 		if (strncmp(string, "TopK", 4)==0){
-			//printf("\n%d\n", counter);
 			for (i=0; i<k; i++){
 				if (topKvet[i].sumPath!=-1){
-					printf("%d", topKvet[i].position);
+					printInt(topKvet[i].position);
 					if (i<k-1 && topKvet[i+1].position!=-1){
-						printf(" ");
+						putchar_unlocked(' ');
 					}
 				}
 				
 			}
 			printf("\n");
 		}
+		
 		if(fgets(string, 15, stdin)){}
-		//printf("%s", string);
 	}
 	
 	return 0;
@@ -86,47 +87,39 @@ long dijkstraSum(int numNodi){
 	
 	long mat[numNodi*numNodi];
 	int n = numNodi-1;
-	const char comma[2] = ",\n";
-	char *token;
-	char *str = malloc(sizeof(char)*10*numNodi+numNodi);
+
+	char c;
 	
 	long sum, currSum;
 	int i, j;
 	int pos;
+	unsigned int val;
 	
 	topKstruct vettore[n];
-	
-	j = 0;
+
 	for (i=0; i<numNodi; i++){
-		if (i>0){
-			vettore[i-1].position = i;
-		}
-		if(fgets(str, 20*numNodi+numNodi, stdin)){}
-		token = strtok(str, comma);
-		while (token != NULL){
-			//printf("%s - ", token);
-			mat[j] = strtol(token, NULL, 10);
-			//mat[j] = atol(token);
+		for (j=0; j<numNodi; j++){
 			
-			if (mat[j] == 0) {
-				mat[j] = LONG_MAX;
+			val = 0;
+			c = getchar_unlocked();
+			while (c!=',' && c!='\n') {
+				val = (val*10) + (c - '0');
+				c = getchar_unlocked();
+			} 
+			
+			if (val == 0) {
+				mat[i*numNodi+j] = LONG_MAX;
+			} else {
+				mat[i*numNodi+j] = val;
 			}
-			if (j<numNodi && j>0){
-				vettore[j-1].sumPath = mat[j];
+			
+			if (i == 0 && j>0){
+				vettore[j-1].sumPath = mat[i*numNodi+j];
+				vettore[j-1].position = j;
 			}
-			token = strtok(NULL, comma);
-			j++;
+			
 		}
-		//printf("\n");	
 	}
-	free(str);
-/*	printf("\n");
-	for (i=0; i<numNodi-1; i++){
-		printf(" %d, %ld -", vettore[i].position, vettore[i].sumPath);
-	}
-	printf("\n");*/
-	//vettore[n-1].position = -1;
-//	vettore[n-1].sumPath = LONG_MAX;
 
 	for (i=n/2; i>=0; i--){
 		min_heapify(vettore, i, n);
@@ -212,4 +205,13 @@ void inserimentoTopK(topKstruct vettore[], int f){
 			inserimentoTopK(vettore, p);
 		}
 	}
+}
+
+void printInt(int num){
+	char c;
+	if (num>9){
+		printInt(num/10);
+	}
+	c = num%10 + '0';
+	putchar_unlocked(c);
 }
