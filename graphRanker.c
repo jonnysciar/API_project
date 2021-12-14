@@ -44,9 +44,9 @@ int main (int argc, char* argv[]){
 			counter++;
 			curr.position = counter;
 			curr.sumPath = dijkstraSum(n);
-			
+			//printf("\n%d - %lu\n", curr.position, curr.sumPath);
 			if (counter<k){
-				topKvet[counter] = curr;
+				topKvet[k-counter-1] = curr;
 			}
 			
 			if (counter>=k){
@@ -117,8 +117,9 @@ long dijkstraSum(int numNodi){
 				vettore[j-1].sumPath = mat[i*numNodi+j];
 				vettore[j-1].position = j;
 			}
-			
+			//printf("%lu - ", mat[i*numNodi+j]);	
 		}
+		//printf("\n");
 	}
 
 	for (i=n/2; i>=0; i--){
