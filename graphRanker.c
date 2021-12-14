@@ -18,7 +18,8 @@ int main (int argc, char* argv[]){
 	int i;
 	int counter = -1;
 	char string[14];
-	topKstruct curr, tmp;
+	topKstruct curr;// max; 
+	int i_max = 0;
 	
 	(void)scanf("%d %d", &n, &k);
 	
@@ -37,15 +38,25 @@ int main (int argc, char* argv[]){
 			counter++;
 			curr.position = counter;
 			curr.sumPath = dijkstraSum(n);
-			//printf("\n%d - %lu\n", curr.position, curr.sumPath);
-			for (i=0; i<k; i++){
-				if (curr.sumPath<topKvet[i].sumPath || topKvet[i].sumPath==-1){
-					tmp.sumPath = topKvet[i].sumPath;
-					tmp.position = topKvet[i].position;
-					topKvet[i].sumPath = curr.sumPath;
-					topKvet[i].position = curr.position;
-					curr.sumPath = tmp.sumPath;
-					curr.position = tmp.position;
+			printf("\n%d - %lu\n", curr.position, curr.sumPath);
+			if (counter<k){
+				topKvet[counter].sumPath = curr.sumPath;
+				topKvet[counter].position = curr.position;
+				if (topKvet[i_max].sumPath<curr.sumPath){
+					i_max = counter;
+					/*max.sumPath = curr.sumPath;
+					max.position = curr.position;*/
+				}
+			}
+			else if (counter>=k){
+				if (curr.sumPath<topKvet[i_max].sumPath){
+					topKvet[i_max].sumPath = curr.sumPath;
+					topKvet[i_max].position = curr.position;
+					for (i=0; i<k; i++){
+						if (topKvet[i].sumPath>topKvet[i_max].sumPath){
+							i_max = i;
+						}
+					}
 				}
 			}
 		
@@ -113,9 +124,9 @@ void checkRow(unsigned long matrice[], unsigned long vettore[], int r, int len){
 				if (sum<vettore[j] || vettore[j]==0){
 					vettore[j]=sum;
 					//printf(" %lu -", vettore[i]);
-					if (j<r){
+					//if (j<r){
 						checkRow(matrice, vettore, j, len);
-					}
+					//}
 				}				
 			}		
 		}
