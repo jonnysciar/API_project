@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <limits.h>
 
 typedef struct {	
@@ -23,7 +22,8 @@ int main (int argc, char* argv[]){
 	int k = 0;
 	int i;
 	int counter = -1;
-	char string[15];
+	
+	char carattere = ' ';
 
 	if (scanf("%d %d\n", &n, &k)){}
 	
@@ -35,11 +35,15 @@ int main (int argc, char* argv[]){
 		topKvet[i].position = -1;
 	}
 	
-	if(fgets(string, 15, stdin)){}
+	carattere = getchar_unlocked();
 	
 	while(!(feof(stdin))){
 
-		if (strncmp(string, "AggiungiGrafo", 13)==0){
+		if (carattere == 'A'){	
+			
+			for (i=0; i<13; i++){
+				getchar_unlocked();
+			}
 			
 			counter++;
 			curr.position = counter;
@@ -63,7 +67,12 @@ int main (int argc, char* argv[]){
 			
 		}
 		
-		if (strncmp(string, "TopK", 4)==0){
+		if (carattere == 'T'){
+			
+			for (i=0; i<4; i++){
+				getchar_unlocked();
+			}
+			
 			for (i=0; i<k; i++){
 				if (topKvet[i].sumPath!=-1){
 					printInt(topKvet[i].position);
@@ -76,7 +85,7 @@ int main (int argc, char* argv[]){
 			printf("\n");
 		}
 		
-		if(fgets(string, 15, stdin)){}
+		carattere = getchar_unlocked();
 	}
 	
 	return 0;
