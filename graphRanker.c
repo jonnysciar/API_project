@@ -1,16 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 typedef struct {	
-	unsigned long sumPath;
+	long sumPath;
 	int position;
 } topKstruct;
 
-unsigned long sumVet(unsigned long[], int);
-unsigned long dijkstraSum(int);
-void heapify(topKstruct[], int);
-void checkRow(unsigned long[], unsigned long[], int, int);
+long dijkstraSum(int);
+void swap(int[], int, int);
+void min_heapify(long[], int[], int, int);
 
 int main (int argc, char* argv[]){
 	int n = 0;
@@ -21,7 +21,8 @@ int main (int argc, char* argv[]){
 	topKstruct curr;// max; 
 	int i_max = 0;
 	
-	(void)scanf("%d %d", &n, &k);
+	
+	if (scanf("%d %d", &n, &k)){}
 	
 	topKstruct topKvet[k];
 	
@@ -31,17 +32,16 @@ int main (int argc, char* argv[]){
 		topKvet[i].position = -1;
 	}
 	
-	(void)scanf("%s", string);
+	if (scanf("%s", string)){}
 	while(!(feof(stdin))){
 
 		if (strncmp(string, "AggiungiGrafo", 13)==0){
 			counter++;
 			curr.position = counter;
 			curr.sumPath = dijkstraSum(n);
-			printf("\n%d - %lu\n", curr.position, curr.sumPath);
+			//printf("\n%d - %lu\n", curr.position, curr.sumPath);
 			if (counter<k){
-				topKvet[counter].sumPath = curr.sumPath;
-				topKvet[counter].position = curr.position;
+				topKvet[counter] = curr;
 				if (topKvet[i_max].sumPath<curr.sumPath){
 					i_max = counter;
 					/*max.sumPath = curr.sumPath;
@@ -50,8 +50,7 @@ int main (int argc, char* argv[]){
 			}
 			else if (counter>=k){
 				if (curr.sumPath<topKvet[i_max].sumPath){
-					topKvet[i_max].sumPath = curr.sumPath;
-					topKvet[i_max].position = curr.position;
+					topKvet[i_max] = curr;
 					for (i=0; i<k; i++){
 						if (topKvet[i].sumPath>topKvet[i_max].sumPath){
 							i_max = i;
@@ -75,69 +74,101 @@ int main (int argc, char* argv[]){
 			}
 			printf("\n");
 		}
-		(void)scanf("%s", string);
+		if (scanf("%s", string)){}
 		
 	}
 	
 	return 0;
 }
 
-void heapify(topKstruct A[], int pos){
-	
-	
-}
 
-
-unsigned long dijkstraSum(int numNodi){
+long dijkstraSum(int numNodi){
 	
-	unsigned long mat[numNodi*numNodi];
-	unsigned long vet[numNodi];
+	long mat[numNodi*numNodi];
+	int n = numNodi-1;
+	int vet[n];
 	
+	long sum;
 	int i, j;
-	vet[0] = 0;
+	
 	for (i=0; i<numNodi; i++){
+		if (i>0){
+			vet[i-1] = i;
+		}
 		for(j=0; j<numNodi; j++){
-			(void)scanf("%lu,", &mat[i*numNodi+j]);
-			if (i==0 && j>0){
-				vet[j]=mat[i*numNodi+j];
+			
+			if (scanf("%lu,", &mat[i*numNodi+j])>0 && mat[i*numNodi+j]==0){
+				mat[i*numNodi+j]=LONG_MAX;
+			}
+			//printf("%lu - ", mat[i*numNodi+j]);	
+		}
+		//printf("\n");
+	}
+	
+	for (i=n/2; i>=0; i--){
+		min_heapify(mat, vet, i, n);
+	}
+	
+	sum = 0;
+	while (n>0 && mat[vet[0]]<LONG_MAX){
+		
+		sum = sum + mat[vet[0]];
+		
+		/*printf("\n");
+		for (i=0; i<n; i++){
+			printf("- %d -", vet[i]);
+		}
+		printf("\n");*/
+		//printf("%d - %lu\n", vet[0], mat[vet[0]]);
+		
+		for (i=1; i<numNodi; i++){
+			if (mat[vet[0]*numNodi+i]<LONG_MAX && vet[0]!=i){
+				if (mat[vet[0]]+mat[vet[0]*numNodi+i]<mat[i]){
+					mat[i] = mat[vet[0]] + mat[vet[0]*numNodi+i];
+					for (i=n/2; i>=0; i--){
+						min_heapify(mat, vet, i, n);
+					}
+				}
 			}
 		}
+		
+		//sum = sum + mat[vet[0]];
+		//mat[vet[0]] = LONG_MAX;
+		vet[0]=vet[n-1];
+		n--;
+		min_heapify(mat, vet, 0, n);
 	}
 	
-	for (i=1; i<numNodi; i++){
-		checkRow(mat, vet, i, numNodi);
-	}
-	/*for (i=0; i<numNodi; i++){
-		printf(" %lu -", vet[i]);
-	}*/
-	return sumVet(vet, numNodi);
-}
-
-void checkRow(unsigned long matrice[], unsigned long vettore[], int r, int len){
-	int j;
-	unsigned long sum;
-	if (vettore[r]!=0){
-		for (j=1; j<len; j++){
-			sum = 0;
-			if (r!=j && matrice[r*len+j]!=0) {
-				sum = matrice[r*len+j] + vettore[r];
-				if (sum<vettore[j] || vettore[j]==0){
-					vettore[j]=sum;
-					//printf(" %lu -", vettore[i]);
-					//if (j<r){
-						checkRow(matrice, vettore, j, len);
-					//}
-				}				
-			}		
+	/*for (i=1; i<numNodi; i++){
+		if (mat[i]<LONG_MAX){
+			sum = sum + mat[i];
 		}
-	}
+	}*/
+	
+	return sum;
 }
 
-unsigned long sumVet(unsigned long v[], int len){
-	int i;
-	unsigned long int sum = 0;
-	for (i=0; i<len; i++){
-		sum = sum + v[i];
+
+void swap(int vettore[], int pos1, int pos2){
+	int tmp;
+	tmp = vettore[pos1];
+	vettore[pos1] = vettore[pos2];
+	vettore[pos2] = tmp;
+}
+
+
+void min_heapify(long matrice[], int vettore[], int n, int len){
+	int l = 2*n+1;
+	int r = 2*n+2;
+	int posmin = n;
+	if (l<len && matrice[vettore[l]]<matrice[vettore[posmin]]){
+		posmin = l;
 	}
-	return sum;
+	if (r<len && matrice[vettore[r]]<matrice[vettore[posmin]]){
+		posmin = r;
+	}
+	if (posmin!=n){
+		swap(vettore, n, posmin);
+		min_heapify(matrice, vettore, posmin, len);
+	}
 }
